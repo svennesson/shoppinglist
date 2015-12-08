@@ -9,6 +9,7 @@ import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.reflections.Reflections;
 import org.skife.jdbi.v2.DBI;
@@ -32,6 +33,12 @@ import se.masv.shoppinglist.service.ShoppinglistService;
 import se.masv.shoppinglist.service.TokenService;
 import se.masv.shoppinglist.service.UserService;
 
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
+import java.util.EnumSet;
+
+import static org.eclipse.jetty.servlets.CrossOriginFilter.*;
+
 public class Main extends Application<ShoppinglistConfiguration>{
 
     private final HibernateBundle<ShoppinglistConfiguration> hibernate = new HibernateBundle<ShoppinglistConfiguration>(User.class, Item.class, Shoppinglist.class) {
@@ -52,6 +59,14 @@ public class Main extends Application<ShoppinglistConfiguration>{
     @Override
     public void run(ShoppinglistConfiguration configuration, Environment environment) throws Exception {
         environment.getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        //CORS
+        final FilterRegistration.Dynamic corsFilter = environment.servlets().addFilter("CORSFilter", CrossOriginFilter.class);
+        corsFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false, "/*");
+        corsFilter.setInitParameter(ALLOWED_METHODS_PARAM, "GET, PUT, POST, OPTIONS, DELETE, HEAD");
+        corsFilter.setInitParameter(ALLOWED_ORIGINS_PARAM, "*");
+        corsFilter.setInitParameter(ALLOWED_HEADERS_PARAM, "Origin, Content-Type, Accept, Authorization");
+        corsFilter.setInitParameter(ALLOW_CREDENTIALS_PARAM, "true");
 
         //Reflections
         final Reflections reflections = new Reflections("se.masv.shoppinglist");
