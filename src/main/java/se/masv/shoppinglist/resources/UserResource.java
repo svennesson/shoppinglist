@@ -73,4 +73,11 @@ public class UserResource {
         userService.addListToUser(userId, listId);
         return Response.ok().build();
     }
+
+    @RolesAllowed(Role.ADMIN)
+    @PUT
+    @Path("{userId}/admin")
+    public Response makeUserAdmin(@Auth User user, @PathParam("userId") final Long userId) {
+        return Response.ok(userService.makeUserAdmin(userId)).build();
+    }
 }

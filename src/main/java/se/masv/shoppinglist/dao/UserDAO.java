@@ -31,4 +31,6 @@ public interface UserDAO{
     @SqlUpdate("UPDATE users SET age = :age, name = :name, email = :email WHERE id = :id")
     int updateUser(@Bind("id") Long userId, @Bind("age") int age, @Bind("name") String name, @Bind("email") String email);
 
+    @SqlQuery("UPDATE users SET role = :role WHERE id = :id RETURNING *")
+    User changeRole(@Bind("role") String role, @Bind("id") Long userId);
 }

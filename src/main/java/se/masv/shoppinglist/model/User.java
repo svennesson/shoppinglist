@@ -30,7 +30,7 @@ public class User extends AbstractEntity implements Principal{
     @Column(nullable = true)
     private int age;
 
-    @Column(nullable = false)
+    @JsonIgnore
     private String role;
 
     @ManyToMany(mappedBy = "users")
@@ -62,7 +62,9 @@ public class User extends AbstractEntity implements Principal{
         this.password = password;
     }
 
-    public User() {}
+    public User() {
+        this.role = "USER";
+    }
 
     public String getName() {
         return name;

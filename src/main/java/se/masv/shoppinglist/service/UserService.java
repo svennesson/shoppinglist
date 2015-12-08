@@ -7,6 +7,7 @@ import se.masv.shoppinglist.dao.UserDAO;
 import se.masv.shoppinglist.dto.UpdateUserCommand;
 import se.masv.shoppinglist.exception.AuthenticationException;
 import se.masv.shoppinglist.model.BasicCredentials;
+import se.masv.shoppinglist.model.Role;
 import se.masv.shoppinglist.model.Shoppinglist;
 import se.masv.shoppinglist.model.User;
 import se.masv.shoppinglist.util.PBKDF2Hash;
@@ -111,6 +112,13 @@ public class UserService {
         }
 
         throw new AuthenticationException("Wrong email and/or password");
+    }
+
+    public User makeUserAdmin(Long userId) {
+        final User user = userDao.getUserById(userId);
+        isValidEntity(user, userId);
+
+        return userDao.changeRole(Role.ADMIN, userId);
     }
 
     private boolean validatePassword(String password, String correctHash) {
