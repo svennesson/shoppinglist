@@ -5,11 +5,9 @@ import se.masv.shoppinglist.dao.ShoppingListDAO;
 import se.masv.shoppinglist.dao.TokenDAO;
 import se.masv.shoppinglist.dao.UserDAO;
 import se.masv.shoppinglist.dto.UpdateUserCommand;
+import se.masv.shoppinglist.dto.WebTokenResponse;
 import se.masv.shoppinglist.exception.AuthenticationException;
-import se.masv.shoppinglist.model.BasicCredentials;
-import se.masv.shoppinglist.model.Role;
-import se.masv.shoppinglist.model.Shoppinglist;
-import se.masv.shoppinglist.model.User;
+import se.masv.shoppinglist.model.*;
 import se.masv.shoppinglist.util.PBKDF2Hash;
 
 import java.util.List;
@@ -89,7 +87,7 @@ public class UserService {
         return userDao.updateUser(userId, user.age, user.name, user.email);
     }
 
-    public UUID authorize(BasicCredentials basicCredentials) {
+    public WebTokenResponse authorize(BasicCredentials basicCredentials) {
         final BasicCredentials userCredentialsInDb = userDao.getUserCredentials(basicCredentials.getEmail());
 
         if (null == userCredentialsInDb) {
@@ -106,9 +104,9 @@ public class UserService {
                 tokenDao.deleteToken(user.getId());
             }
 
-            tokenDao.insertUserToken(user.getId(), uuid);
+            final AccessToken accessToken = tokenDao.insertUserToken(user.getId(), uuid);
 
-            return uuid;
+            return new WebTokenResponse(accessToken, user.getRole());
         }
 
         throw new AuthenticationException("Wrong email and/or password");
