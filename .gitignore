@@ -142,6 +142,8 @@ node_modules
 # Optional REPL history
 .node_repl_history
 
+# Log files
+client/*.log
 
 ### Bower ###
 bower_components
